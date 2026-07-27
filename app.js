@@ -318,6 +318,8 @@ function renderQuestion() {
     
     // Render Options
     elements.optionsContainer.innerHTML = '';
+    const hasAnswered = state.answers[q.id] !== undefined;
+    const selectedAnswer = state.answers[q.id];
     const correctAnswer = q.correct_answer ? q.correct_answer.toLowerCase() : null;
     
     // Check if question has no options (empty options = user can't answer, would get stuck)
@@ -346,19 +348,31 @@ function renderQuestion() {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             
-            // In Reading Mode, automatically highlight the correct answer
-            if (correctAnswer !== null && opt.letter.toLowerCase() === correctAnswer) {
-                btn.classList.add('correct');
+            if (hasAnswered) {
+                btn.disabled = true;
+                if (opt.letter === selectedAnswer) {
+                    if (correctAnswer === null) {
+                        btn.style.backgroundColor = 'var(--border-color)';
+                    } else if (selectedAnswer === correctAnswer) {
+                        btn.classList.add('correct');
+                    } else {
+                        btn.classList.add('wrong');
+                    }
+                } else if (correctAnswer !== null && opt.letter === correctAnswer) {
+                    if (selectedAnswer !== correctAnswer) {
+                        btn.classList.add('pdf-correct');
+                    }
+                }
             }
-            
-            // Make button look non-interactive since we're just reading
-            btn.style.cursor = 'default';
-            btn.style.pointerEvents = 'none';
             
             btn.innerHTML = `
                 <span class="option-letter">${opt.letter}</span>
                 <span class="option-text">${opt.text}</span>
             `;
+            
+            if (!hasAnswered) {
+                btn.addEventListener('click', () => handleAnswer(q.id, opt.letter, correctAnswer));
+            }
             
             elements.optionsContainer.appendChild(btn);
         });
@@ -371,10 +385,12 @@ function renderQuestion() {
         // Questions with no options
         elements.btnNext.classList.remove('hidden');
         elements.btnNext.disabled = state.currentIndex >= state.questions.length - 1;
-    } else {
-        // In reading mode, next button is always visible
+    } else if (hasAnswered) {
+        showFeedback(selectedAnswer === correctAnswer, correctAnswer);
         elements.btnNext.classList.remove('hidden');
-        elements.btnNext.disabled = state.currentIndex >= state.questions.length - 1;
+        elements.btnNext.disabled = false;
+    } else {
+        elements.btnNext.classList.add('hidden');
     }
 }
 
