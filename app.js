@@ -1,0 +1,381 @@
+const DATA_URL = 'data';
+
+// State
+let state = {
+    blocks: [],
+    currentBlock: null,
+    questions: [],
+    currentIndex: 0,
+    answers: {}, // { question_id: selected_letter }
+    isDarkMode: false
+};
+
+// DOM Elements
+const elements = {
+    app: document.getElementById('app'),
+    blockSelect: document.getElementById('block-select'),
+    themeToggle: document.getElementById('theme-toggle'),
+    btnReport: document.getElementById('btn-report'),
+    reportModal: document.getElementById('report-modal'),
+    closeModal: document.getElementById('close-modal'),
+    statsContainer: document.getElementById('stats-container'),
+    loading: document.getElementById('loading'),
+    quizContainer: document.getElementById('quiz-container'),
+    emptyState: document.getElementById('empty-state'),
+    
+    questionCounter: document.getElementById('question-counter'),
+    progressPercentage: document.getElementById('progress-percentage'),
+    progressBar: document.getElementById('progressBar') || document.getElementById('progress-bar'),
+    
+    questionNumber: document.getElementById('question-number'),
+    questionText: document.getElementById('question-text'),
+    questionImageContainer: document.getElementById('question-image-container'),
+    questionImage: document.getElementById('question-image'),
+    
+    optionsContainer: document.getElementById('options-container'),
+    
+    feedbackContainer: document.getElementById('feedback-container'),
+    feedbackMessage: document.getElementById('feedback-message'),
+    
+    btnPrev: document.getElementById('btn-prev'),
+    btnNext: document.getElementById('btn-next')
+};
+
+// Initialization
+async function init() {
+    setupTheme();
+    setupEventListeners();
+    await fetchBlocks();
+}
+
+// Theme Management
+function setupTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        state.isDarkMode = true;
+        elements.app.classList.remove('light-mode');
+        elements.app.classList.add('dark-mode');
+        elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+}
+
+function toggleTheme() {
+    state.isDarkMode = !state.isDarkMode;
+    if (state.isDarkMode) {
+        elements.app.classList.remove('light-mode');
+        elements.app.classList.add('dark-mode');
+        elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        elements.app.classList.remove('dark-mode');
+        elements.app.classList.add('light-mode');
+        elements.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Event Listeners
+function setupEventListeners() {
+    elements.themeToggle.addEventListener('click', toggleTheme);
+    elements.blockSelect.addEventListener('change', (e) => {
+        if (e.target.value) {
+            loadBlock(e.target.value);
+        } else {
+            showEmptyState();
+        }
+    });
+    
+    elements.btnPrev.addEventListener('click', () => {
+        if (state.currentIndex > 0) {
+            state.currentIndex--;
+            renderQuestion();
+        }
+    });
+    
+    elements.btnNext.addEventListener('click', () => {
+        if (state.currentIndex < state.questions.length - 1) {
+            state.currentIndex++;
+            renderQuestion();
+        }
+    });
+    
+    elements.btnReport.addEventListener('click', openReportModal);
+    elements.closeModal.addEventListener('click', () => {
+        elements.reportModal.classList.add('hidden');
+    });
+}
+
+// Report Modal Logic
+async function openReportModal() {
+    elements.reportModal.classList.remove('hidden');
+    elements.statsContainer.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>Memuat Report...</p></div>';
+    
+    try {
+        const res = await fetch(`${DATA_URL}/stats.json`);
+        const stats = await res.json();
+        
+        let html = `
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="font-size: 2rem; color: var(--accent-primary)">Total Akurasi: ${stats.accuracy}%</h3>
+            </div>
+        `;
+        
+        for (const block of stats.blocks) {
+            html += `
+                <div class="stat-card">
+                    <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        ${block.block_name}
+                        <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="loadLogs('${block.block_id}', this)">Lihat Validation Log</button>
+                    </h3>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 1rem; line-height: 1.6;">
+                        ${block.total} SOAL <br>
+                        &darr; <br>
+                        <span style="color:var(--correct-border)">${block.valid} VALID (PyMuPDF: ${block.pymupdf}, Rescue: ${block.rescue})</span> <br>
+                        &darr; <br>
+                        <span style="color:#d97706">${block.scan_ulang} SCAN ULANG (Warning / Ambigu)</span> <br>
+                        &darr; <br>
+                        <span style="color:var(--wrong-border)">${block.null} NULL</span>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">${block.with_image}</div>
+                            <div class="stat-label">Soal Bergambar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${block.no_image}</div>
+                            <div class="stat-label">Tanpa Gambar</div>
+                        </div>
+                    </div>
+                    <div id="logs-${block.block_id}" class="logs-container hidden" style="margin-top: 1rem; max-height: 400px; overflow-y: auto;"></div>
+                </div>
+            `;
+        }
+        
+        elements.statsContainer.innerHTML = html;
+        
+    } catch (e) {
+        elements.statsContainer.innerHTML = '<p style="color: red;">Gagal memuat report.</p>';
+    }
+}
+
+window.loadLogs = async function(blockId, btn) {
+    const container = document.getElementById(`logs-${blockId}`);
+    if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        btn.textContent = 'Lihat Validation Log';
+        return;
+    }
+    
+    btn.textContent = 'Sembunyikan Log';
+    container.classList.remove('hidden');
+    container.innerHTML = 'Memuat log...';
+    
+    try {
+        const res = await fetch(`${DATA_URL}/logs_${blockId}.json`);
+        const logs = await res.json();
+        
+        let html = '<table class="log-table"><thead><tr><th>No</th><th>Status</th><th>Metode</th><th>% Biru</th><th>Tahapan</th><th>Conf</th><th>Kunci</th><th>Gbr</th><th>S.Ulang</th><th>Mult</th><th>Alasan</th></tr></thead><tbody>';
+        
+        logs.forEach(log => {
+            let badgeClass = 'valid';
+            if (log.status === 'WARNING') badgeClass = 'warning';
+            if (log.status === 'NULL') badgeClass = 'null';
+            
+            let bluePctStr = (log.blue_percentage !== undefined && log.blue_percentage !== null) ? log.blue_percentage.toFixed(2) + '%' : '-';
+            let stagesHtml = (log.validation_stages && log.validation_stages.length > 0) 
+                ? '<ul style="margin:0; padding-left:15px; font-size:0.65rem; color: var(--text-secondary);">' + log.validation_stages.map(s => `<li>${s}</li>`).join('') + '</ul>'
+                : '-';
+            
+            html += `
+                <tr>
+                    <td>${log.number}</td>
+                    <td><span class="badge ${badgeClass}">${log.status}</span></td>
+                    <td>${log.method}</td>
+                    <td>${bluePctStr}</td>
+                    <td style="max-width: 200px; overflow-x: auto;">${stagesHtml}</td>
+                    <td>${log.confidence_score}%</td>
+                    <td>${log.correct_answer || '-'}</td>
+                    <td>${log.has_image ? 'Y' : 'T'}</td>
+                    <td>${log.is_rescued ? 'Y' : 'T'}</td>
+                    <td>${log.is_multiple_answer ? 'Y' : 'T'}</td>
+                    <td style="font-size: 0.75rem; color: var(--text-secondary);">${log.reason}</td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        container.innerHTML = html;
+        
+    } catch (e) {
+        container.innerHTML = 'Gagal memuat log.';
+    }
+}
+
+// API Calls
+async function fetchBlocks() {
+    try {
+        const res = await fetch(`${DATA_URL}/blocks.json`);
+        if (!res.ok) throw new Error('Failed to fetch blocks');
+        const blocks = await res.json();
+        state.blocks = blocks;
+        
+        elements.blockSelect.innerHTML = '<option value="">Pilih Blok Soal</option>';
+        blocks.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id;
+            opt.textContent = b.name;
+            elements.blockSelect.appendChild(opt);
+        });
+    } catch (err) {
+        console.error(err);
+        alert('Gagal memuat daftar blok soal.');
+    }
+}
+
+async function loadBlock(blockId) {
+    state.currentBlock = blockId;
+    showLoading();
+    
+    try {
+        const res = await fetch(`${DATA_URL}/questions_${blockId}.json`);
+        if (!res.ok) throw new Error('Failed to fetch questions');
+        const questions = await res.json();
+        
+        state.questions = questions;
+        state.currentIndex = 0;
+        state.answers = {};
+        
+        if (questions.length > 0) {
+            renderQuestion();
+            showQuiz();
+        } else {
+            alert('Tidak ada soal pada blok ini.');
+            showEmptyState();
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Gagal memuat soal.');
+        showEmptyState();
+    }
+}
+
+// UI State Managers
+function showLoading() {
+    elements.emptyState.classList.add('hidden');
+    elements.quizContainer.classList.add('hidden');
+    elements.loading.classList.remove('hidden');
+}
+
+function showEmptyState() {
+    elements.loading.classList.add('hidden');
+    elements.quizContainer.classList.add('hidden');
+    elements.emptyState.classList.remove('hidden');
+}
+
+function showQuiz() {
+    elements.loading.classList.add('hidden');
+    elements.emptyState.classList.add('hidden');
+    elements.quizContainer.classList.remove('hidden');
+}
+
+// Render Logic
+function renderQuestion() {
+    const q = state.questions[state.currentIndex];
+    const total = state.questions.length;
+    const progress = Math.round(((state.currentIndex + 1) / total) * 100);
+    
+    // Update Progress
+    elements.questionCounter.textContent = `Soal ${state.currentIndex + 1} dari ${total}`;
+    elements.progressPercentage.textContent = `${progress}%`;
+    elements.progressBar.style.width = `${progress}%`;
+    
+    // Update Question Content
+    elements.questionNumber.textContent = `Soal ${q.number}`;
+    elements.questionText.textContent = q.text;
+    
+    // Handle Image
+    if (q.image) {
+        elements.questionImage.src = `images/${q.image}`;
+        elements.questionImageContainer.classList.remove('hidden');
+    } else {
+        elements.questionImage.src = '';
+        elements.questionImageContainer.classList.add('hidden');
+    }
+    
+    // Reset Feedback
+    elements.feedbackContainer.classList.add('hidden');
+    elements.feedbackContainer.className = 'feedback-container hidden';
+    
+    // Render Options
+    elements.optionsContainer.innerHTML = '';
+    const hasAnswered = state.answers[q.id] !== undefined;
+    const selectedAnswer = state.answers[q.id];
+    const correctAnswer = q.correct_answer;
+    
+    q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        if (hasAnswered) {
+            btn.disabled = true;
+            if (opt.letter === selectedAnswer) {
+                if (correctAnswer === null) {
+                    // Do nothing or add a neutral class if we don't know the answer
+                    btn.style.backgroundColor = 'var(--border-color)';
+                } else if (selectedAnswer === correctAnswer) {
+                    btn.classList.add('correct');
+                } else {
+                    btn.classList.add('wrong');
+                }
+            } else if (correctAnswer !== null && opt.letter === correctAnswer) {
+                // If user answered wrong, show the correct answer with STABILO BIRU MUDA
+                if (selectedAnswer !== correctAnswer) {
+                    btn.classList.add('pdf-correct');
+                }
+            }
+        }
+        
+        btn.innerHTML = `
+            <span class="option-letter">${opt.letter}</span>
+            <span class="option-text">${opt.text}</span>
+        `;
+        
+        if (!hasAnswered) {
+            btn.addEventListener('click', () => handleAnswer(q.id, opt.letter, correctAnswer));
+        }
+        
+        elements.optionsContainer.appendChild(btn);
+    });
+    
+    // Update Navigation
+    elements.btnPrev.disabled = state.currentIndex === 0;
+    
+    if (hasAnswered) {
+        showFeedback(selectedAnswer === correctAnswer, correctAnswer);
+        elements.btnNext.classList.remove('hidden');
+        elements.btnNext.disabled = false;
+    } else {
+        elements.btnNext.classList.add('hidden');
+    }
+}
+
+function handleAnswer(questionId, selectedLetter, correctLetter) {
+    state.answers[questionId] = selectedLetter;
+    renderQuestion(); // Re-render to show colors and lock options
+}
+
+function showFeedback(isCorrect, correctLetter) {
+    elements.feedbackContainer.classList.remove('hidden');
+    if (correctLetter === null) {
+        elements.feedbackContainer.classList.add('null-feedback');
+        elements.feedbackMessage.textContent = 'KUNCI JAWABAN SOAL INI TIDAK TERSEDIA (NULL)';
+    } else if (isCorrect) {
+        elements.feedbackContainer.classList.add('correct');
+        elements.feedbackMessage.textContent = 'JAWABAN ANDA BENAR';
+    } else {
+        elements.feedbackContainer.classList.add('wrong');
+        elements.feedbackMessage.textContent = `JAWABAN YANG BENAR ADALAH ${correctLetter.toUpperCase()}`;
+    }
+}
+
+// Start app
+document.addEventListener('DOMContentLoaded', init);

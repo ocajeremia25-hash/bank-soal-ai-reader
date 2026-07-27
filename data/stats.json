@@ -1,0 +1,43 @@
+{
+  "blocks": [
+    {
+      "block_id": "blok1",
+      "block_name": "Blok 1",
+      "total": 218,
+      "valid": 173,
+      "pymupdf": 0,
+      "rescue": 0,
+      "null": 45,
+      "with_image": 19,
+      "no_image": 199,
+      "scan_ulang": 218
+    },
+    {
+      "block_id": "blok2",
+      "block_name": "Blok 2",
+      "total": 181,
+      "valid": 144,
+      "pymupdf": 50,
+      "rescue": 0,
+      "null": 37,
+      "with_image": 20,
+      "no_image": 161,
+      "scan_ulang": 131
+    },
+    {
+      "block_id": "blok3",
+      "block_name": "Blok 3",
+      "total": 24,
+      "valid": 5,
+      "pymupdf": 0,
+      "rescue": 0,
+      "null": 19,
+      "with_image": 13,
+      "no_image": 11,
+      "scan_ulang": 24
+    }
+  ],
+  "total_questions": 423,
+  "total_valid": 322,
+  "accuracy": 76.12
+}
