@@ -318,9 +318,7 @@ function renderQuestion() {
     
     // Render Options
     elements.optionsContainer.innerHTML = '';
-    const hasAnswered = state.answers[q.id] !== undefined;
-    const selectedAnswer = state.answers[q.id];
-    const correctAnswer = q.correct_answer;
+    const correctAnswer = q.correct_answer ? q.correct_answer.toLowerCase() : null;
     
     // Check if question has no options (empty options = user can't answer, would get stuck)
     const hasNoOptions = !q.options || q.options.length === 0;
@@ -347,33 +345,20 @@ function renderQuestion() {
         q.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            if (hasAnswered) {
-                btn.disabled = true;
-                if (opt.letter === selectedAnswer) {
-                    if (correctAnswer === null) {
-                        // Do nothing or add a neutral class if we don't know the answer
-                        btn.style.backgroundColor = 'var(--border-color)';
-                    } else if (selectedAnswer === correctAnswer) {
-                        btn.classList.add('correct');
-                    } else {
-                        btn.classList.add('wrong');
-                    }
-                } else if (correctAnswer !== null && opt.letter === correctAnswer) {
-                    // If user answered wrong, show the correct answer with STABILO BIRU MUDA
-                    if (selectedAnswer !== correctAnswer) {
-                        btn.classList.add('pdf-correct');
-                    }
-                }
+            
+            // In Reading Mode, automatically highlight the correct answer
+            if (correctAnswer !== null && opt.letter.toLowerCase() === correctAnswer) {
+                btn.classList.add('correct');
             }
+            
+            // Make button look non-interactive since we're just reading
+            btn.style.cursor = 'default';
+            btn.style.pointerEvents = 'none';
             
             btn.innerHTML = `
                 <span class="option-letter">${opt.letter}</span>
                 <span class="option-text">${opt.text}</span>
             `;
-            
-            if (!hasAnswered) {
-                btn.addEventListener('click', () => handleAnswer(q.id, opt.letter, correctAnswer));
-            }
             
             elements.optionsContainer.appendChild(btn);
         });
@@ -383,18 +368,13 @@ function renderQuestion() {
     elements.btnPrev.disabled = state.currentIndex === 0;
     
     if (hasNoOptions) {
-        // Questions with no options: auto-show Next button and feedback so user can continue
-        elements.feedbackContainer.classList.remove('hidden');
-        elements.feedbackContainer.className = 'feedback-container null-feedback';
-        elements.feedbackMessage.textContent = 'OPSI JAWABAN TIDAK TERSEDIA - LANJUT KE SOAL BERIKUTNYA';
+        // Questions with no options
         elements.btnNext.classList.remove('hidden');
         elements.btnNext.disabled = state.currentIndex >= state.questions.length - 1;
-    } else if (hasAnswered) {
-        showFeedback(selectedAnswer === correctAnswer, correctAnswer);
-        elements.btnNext.classList.remove('hidden');
-        elements.btnNext.disabled = false;
     } else {
-        elements.btnNext.classList.add('hidden');
+        // In reading mode, next button is always visible
+        elements.btnNext.classList.remove('hidden');
+        elements.btnNext.disabled = state.currentIndex >= state.questions.length - 1;
     }
 }
 
