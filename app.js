@@ -239,9 +239,15 @@ async function loadBlock(blockId) {
     try {
         const res = await fetch(`${DATA_URL}/questions_${blockId}.json`);
         if (!res.ok) throw new Error('Failed to fetch questions');
-        const questions = await res.json();
+        const rawQuestions = await res.json();
         
-        state.questions = questions;
+        // Filter out completely empty ghost questions (no text, no image, no options)
+        state.questions = rawQuestions.filter(q => {
+            const hasText = q.text && q.text.trim().length > 0;
+            const hasImage = q.image !== null;
+            const hasOptions = q.options && q.options.length > 0;
+            return hasText || hasImage || hasOptions;
+        });
         state.currentIndex = 0;
         state.answers = {};
         
@@ -290,7 +296,7 @@ function renderQuestion() {
     elements.progressBar.style.width = `${progress}%`;
     
     // Update Question Content
-    elements.questionNumber.textContent = `Soal ${q.number}`;
+    elements.questionNumber.textContent = `Soal ${state.currentIndex + 1}`;
     if (q.text && q.text.trim().length > 0) {
         elements.questionText.textContent = q.text;
     } else {
@@ -393,7 +399,7 @@ function showFeedback(isCorrect, correctLetter) {
     elements.feedbackContainer.classList.remove('hidden');
     if (correctLetter === null) {
         elements.feedbackContainer.classList.add('null-feedback');
-        elements.feedbackMessage.textContent = 'KUNCI JAWABAN SOAL INI TIDAK TERSEDIA (NULL)';
+        elements.feedbackMessage.textContent = 'JAWABAN TERSIMPAN (Kunci jawaban tidak tersedia untuk soal ini)';
     } else if (isCorrect) {
         elements.feedbackContainer.classList.add('correct');
         elements.feedbackMessage.textContent = 'JAWABAN ANDA BENAR';
