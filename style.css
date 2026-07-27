@@ -376,6 +376,28 @@ body {
     border: 1px solid var(--text-secondary);
 }
 
+/* No Options Notice - shown when question has no answer options */
+.no-options-notice {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.12));
+    border: 1px dashed #f59e0b;
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+}
+
+.no-options-notice i {
+    font-size: 2rem;
+    color: #f59e0b;
+    margin-bottom: 0.75rem;
+}
+
+.no-options-notice p {
+    margin: 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }

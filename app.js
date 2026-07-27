@@ -291,7 +291,11 @@ function renderQuestion() {
     
     // Update Question Content
     elements.questionNumber.textContent = `Soal ${q.number}`;
-    elements.questionText.textContent = q.text;
+    if (q.text && q.text.trim().length > 0) {
+        elements.questionText.textContent = q.text;
+    } else {
+        elements.questionText.innerHTML = '<em style="color: var(--text-secondary); opacity: 0.6;">Teks soal tidak tersedia (lihat gambar jika ada)</em>';
+    }
     
     // Handle Image
     if (q.image) {
@@ -312,44 +316,66 @@ function renderQuestion() {
     const selectedAnswer = state.answers[q.id];
     const correctAnswer = q.correct_answer;
     
-    q.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        if (hasAnswered) {
-            btn.disabled = true;
-            if (opt.letter === selectedAnswer) {
-                if (correctAnswer === null) {
-                    // Do nothing or add a neutral class if we don't know the answer
-                    btn.style.backgroundColor = 'var(--border-color)';
-                } else if (selectedAnswer === correctAnswer) {
-                    btn.classList.add('correct');
-                } else {
-                    btn.classList.add('wrong');
-                }
-            } else if (correctAnswer !== null && opt.letter === correctAnswer) {
-                // If user answered wrong, show the correct answer with STABILO BIRU MUDA
-                if (selectedAnswer !== correctAnswer) {
-                    btn.classList.add('pdf-correct');
+    // Check if question has no options (empty options = user can't answer, would get stuck)
+    const hasNoOptions = !q.options || q.options.length === 0;
+    
+    if (hasNoOptions) {
+        // Show a notice that this question has no options available
+        const notice = document.createElement('div');
+        notice.className = 'no-options-notice';
+        notice.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Soal ini tidak memiliki opsi jawaban.</p>
+            <p style="font-size: 0.85rem; opacity: 0.7;">Data opsi tidak tersedia dari hasil parsing PDF. Klik "Selanjutnya" untuk melanjutkan.</p>
+        `;
+        elements.optionsContainer.appendChild(notice);
+    } else {
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            if (hasAnswered) {
+                btn.disabled = true;
+                if (opt.letter === selectedAnswer) {
+                    if (correctAnswer === null) {
+                        // Do nothing or add a neutral class if we don't know the answer
+                        btn.style.backgroundColor = 'var(--border-color)';
+                    } else if (selectedAnswer === correctAnswer) {
+                        btn.classList.add('correct');
+                    } else {
+                        btn.classList.add('wrong');
+                    }
+                } else if (correctAnswer !== null && opt.letter === correctAnswer) {
+                    // If user answered wrong, show the correct answer with STABILO BIRU MUDA
+                    if (selectedAnswer !== correctAnswer) {
+                        btn.classList.add('pdf-correct');
+                    }
                 }
             }
-        }
-        
-        btn.innerHTML = `
-            <span class="option-letter">${opt.letter}</span>
-            <span class="option-text">${opt.text}</span>
-        `;
-        
-        if (!hasAnswered) {
-            btn.addEventListener('click', () => handleAnswer(q.id, opt.letter, correctAnswer));
-        }
-        
-        elements.optionsContainer.appendChild(btn);
-    });
+            
+            btn.innerHTML = `
+                <span class="option-letter">${opt.letter}</span>
+                <span class="option-text">${opt.text}</span>
+            `;
+            
+            if (!hasAnswered) {
+                btn.addEventListener('click', () => handleAnswer(q.id, opt.letter, correctAnswer));
+            }
+            
+            elements.optionsContainer.appendChild(btn);
+        });
+    }
     
     // Update Navigation
     elements.btnPrev.disabled = state.currentIndex === 0;
     
-    if (hasAnswered) {
+    if (hasNoOptions) {
+        // Questions with no options: auto-show Next button and feedback so user can continue
+        elements.feedbackContainer.classList.remove('hidden');
+        elements.feedbackContainer.className = 'feedback-container null-feedback';
+        elements.feedbackMessage.textContent = 'OPSI JAWABAN TIDAK TERSEDIA - LANJUT KE SOAL BERIKUTNYA';
+        elements.btnNext.classList.remove('hidden');
+        elements.btnNext.disabled = state.currentIndex >= state.questions.length - 1;
+    } else if (hasAnswered) {
         showFeedback(selectedAnswer === correctAnswer, correctAnswer);
         elements.btnNext.classList.remove('hidden');
         elements.btnNext.disabled = false;
