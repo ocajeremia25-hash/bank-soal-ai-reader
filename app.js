@@ -251,7 +251,7 @@ async function loadBlock(blockId) {
         state.currentIndex = 0;
         state.answers = {};
         
-        if (questions.length > 0) {
+        if (state.questions.length > 0) {
             renderQuestion();
             showQuiz();
         } else {
