@@ -93,40 +93,20 @@
         "text": " Gagal jantung pasien tidak pernah mengalami"
       },
       {
-        "letter": "a",
-        "text": " USG abdomen"
-      },
-      {
         "letter": "b",
         "text": " Batuk produktif keluhan tersebut. Apakah pemeriksaan"
-      },
-      {
-        "letter": "b",
-        "text": " BNO-IVP"
       },
       {
         "letter": "c",
         "text": " Angioedema awal yang dilakukan untuk"
       },
       {
-        "letter": "c",
-        "text": " CT-Scan abdomen"
-      },
-      {
         "letter": "d",
         "text": " Batuk kering menegakkan diagnosis pada kasus"
       },
       {
-        "letter": "d",
-        "text": " Colok dubur"
-      },
-      {
         "letter": "e",
         "text": " Pening diatas?"
-      },
-      {
-        "letter": "e",
-        "text": " Urinalisa"
       }
     ]
   },
@@ -268,10 +248,6 @@
       {
         "letter": "e",
         "text": " badan lemah, pucat, mual dan buang"
-      },
-      {
-        "letter": "e",
-        "text": " Sindrom Good Pasture pasien memiliki riwayat darah tinggi sejak 10 tahun yang lalu dan kencing manis yang diketahui 1 tahun ini pemeriksaan fisik didapatkan tekanan darah 190/100 mmHg .  denyut nadi 100 kali/menit,  frekuensi nafas 38 x/menit konjungtiva pucat, ronkhi basah halus di basal Paru,  shifting dulnes dan edema tungkai."
       }
     ]
   },
@@ -287,32 +263,16 @@
         "text": " Hysterosalphyngography mg/dl , kalium 5,9 mg/dL, GDS 210"
       },
       {
-        "letter": "a",
-        "text": " Sindrom nefritik akut"
-      },
-      {
         "letter": "b",
         "text": " Urethrography mg/dL . apakah diagnosis yang tepat"
-      },
-      {
-        "letter": "b",
-        "text": " Penyakit ginjal kronik"
       },
       {
         "letter": "c",
         "text": " Cystography pada kasus?"
       },
       {
-        "letter": "c",
-        "text": " Gagal ginjal akut"
-      },
-      {
         "letter": "d",
         "text": " Sindrom nefrotik"
-      },
-      {
-        "letter": "d",
-        "text": " Micturating"
       },
       {
         "letter": "e",
@@ -345,44 +305,20 @@
         "text": " Sindrom klinikopatologi"
       },
       {
-        "letter": "a",
-        "text": " Sisa nitrogen"
-      },
-      {
         "letter": "b",
         "text": " Poliarteritis nodusa"
-      },
-      {
-        "letter": "b",
-        "text": " Kreatinin"
       },
       {
         "letter": "c",
         "text": " Sistemik Lupus Eritematosus"
       },
       {
-        "letter": "c",
-        "text": " Fosfat"
-      },
-      {
         "letter": "d",
         "text": ""
       },
       {
-        "letter": "d",
-        "text": " Kalium"
-      },
-      {
         "letter": "e",
         "text": ""
-      },
-      {
-        "letter": "e",
-        "text": " Glomerulonefritis fokal"
-      },
-      {
-        "letter": "e",
-        "text": " Protein plasma"
       }
     ]
   },
@@ -406,44 +342,20 @@
         "text": " Calyces majores kemungkinan diagnosa yang paling"
       },
       {
-        "letter": "a",
-        "text": " Sindroma nefritik"
-      },
-      {
         "letter": "b",
         "text": " Pronephros tepat pada pasien tersebut?"
-      },
-      {
-        "letter": "b",
-        "text": " Glomerulonefritis kronis"
       },
       {
         "letter": "c",
         "text": " Dari pemeriksaan tubulus ginjal berkembang akibat laboratorium didapatkan adanya stimulasi dan diferensi spesiasi hipoalbuminemia, hiperlipideia dan dari: protein urin 4,3 gr/hari . Apakah"
       },
       {
-        "letter": "c",
-        "text": " Pyelum"
-      },
-      {
-        "letter": "c",
-        "text": " Sindroma nefrotik"
-      },
-      {
         "letter": "d",
         "text": " Mesonepros"
       },
       {
-        "letter": "d",
-        "text": " Glomerulonefritis akut"
-      },
-      {
         "letter": "e",
         "text": " Blastema metanephrogenica"
-      },
-      {
-        "letter": "e",
-        "text": " Pyelonefritis akut"
       }
     ]
   },
@@ -480,56 +392,20 @@
         "text": " Furosemide"
       },
       {
-        "letter": "a",
-        "text": " Sindom nefrotik"
-      },
-      {
         "letter": "b",
         "text": " Tiazid"
-      },
-      {
-        "letter": "b",
-        "text": " Antegrade pyelography"
-      },
-      {
-        "letter": "b",
-        "text": " Sindrom hemolitic uremic"
       },
       {
         "letter": "c",
         "text": " Amilorid"
       },
       {
-        "letter": "c",
-        "text": " Retrograde pyelography"
-      },
-      {
-        "letter": "c",
-        "text": " Stenosis arteri renalis"
-      },
-      {
         "letter": "d",
         "text": " Triamterene"
       },
       {
-        "letter": "d",
-        "text": " Cystourethrography"
-      },
-      {
-        "letter": "d",
-        "text": " Hipoplasia ginjal"
-      },
-      {
         "letter": "e",
         "text": " Spironolakton"
-      },
-      {
-        "letter": "e",
-        "text": " Micturating cystourethrography"
-      },
-      {
-        "letter": "e",
-        "text": " Glomerulonefritis akut pasca streptococcus . . ."
       }
     ]
   },

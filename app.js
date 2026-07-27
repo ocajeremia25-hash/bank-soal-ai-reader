@@ -326,15 +326,23 @@ function renderQuestion() {
     const hasNoOptions = !q.options || q.options.length === 0;
     
     if (hasNoOptions) {
-        // Show a notice that this question has no options available
-        const notice = document.createElement('div');
-        notice.className = 'no-options-notice';
-        notice.innerHTML = `
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>Soal ini tidak memiliki opsi jawaban.</p>
-            <p style="font-size: 0.85rem; opacity: 0.7;">Data opsi tidak tersedia dari hasil parsing PDF. Klik "Selanjutnya" untuk melanjutkan.</p>
+        const noOptionsHTML = `
+            <div style="background: var(--surface); border: 1px dashed var(--border-color); border-radius: 12px; padding: 2rem; text-align: center; color: var(--text-secondary); margin-top: 1rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem; opacity: 0.5;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <div style="font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary);">Opsi Jawaban Tidak Tersedia</div>
+                <div style="font-size: 0.9rem;">Sistem tidak mendeteksi adanya pilihan ganda untuk soal ini dari data asli. Silakan catat jawaban Anda secara mandiri atau lewati soal ini.</div>
+            </div>
         `;
-        elements.optionsContainer.appendChild(notice);
+        elements.optionsContainer.innerHTML = noOptionsHTML;
+        
+        // Auto-show next button so user isn't stuck
+        elements.btnNext.classList.remove('hidden');
     } else {
         q.options.forEach(opt => {
             const btn = document.createElement('button');
