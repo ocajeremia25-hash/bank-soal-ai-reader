@@ -352,7 +352,7 @@ function renderQuestion() {
                 btn.disabled = true;
                 if (opt.letter === selectedAnswer) {
                     if (correctAnswer === null) {
-                        btn.style.backgroundColor = 'var(--border-color)';
+                        btn.classList.add('selected-neutral');
                     } else if (selectedAnswer === correctAnswer) {
                         btn.classList.add('correct');
                     } else {
@@ -403,13 +403,13 @@ function showFeedback(isCorrect, correctLetter) {
     elements.feedbackContainer.classList.remove('hidden');
     if (correctLetter === null) {
         elements.feedbackContainer.classList.add('null-feedback');
-        elements.feedbackMessage.textContent = 'JAWABAN TERSIMPAN (Kunci jawaban tidak tersedia untuk soal ini)';
+        elements.feedbackMessage.textContent = 'JAWABAN TERSIMPAN (Belum ada kunci jawaban)';
     } else if (isCorrect) {
         elements.feedbackContainer.classList.add('correct');
-        elements.feedbackMessage.textContent = 'JAWABAN ANDA BENAR';
+        elements.feedbackMessage.innerHTML = '✅ <strong>JAWABAN ANDA BENAR</strong>';
     } else {
         elements.feedbackContainer.classList.add('wrong');
-        elements.feedbackMessage.textContent = `JAWABAN YANG BENAR ADALAH ${correctLetter.toUpperCase()}`;
+        elements.feedbackMessage.innerHTML = `❌ <strong>SALAH</strong> &mdash; JAWABAN YANG BENAR ADALAH: <strong>${correctLetter.toUpperCase()}</strong>`;
     }
 }
 

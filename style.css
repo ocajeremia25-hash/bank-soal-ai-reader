@@ -8,10 +8,10 @@
     --accent-primary: #3b82f6;
     --accent-hover: #2563eb;
     
-    /* Quiz Colors */
-    --correct-bg: rgba(16, 185, 129, 0.1);
-    --correct-border: #10b981;
-    --correct-text: #047857;
+    /* Quiz Colors (Correct is now pale light blue) */
+    --correct-bg: #e0f2fe;
+    --correct-border: #7dd3fc;
+    --correct-text: #0284c7;
     
     --wrong-bg: rgba(239, 68, 68, 0.1);
     --wrong-border: #ef4444;
@@ -21,8 +21,8 @@
     --pdf-correct-border: #38bdf8;
     --pdf-correct-text: #0369a1;
 
-    --option-bg: #e0f2fe; /* Biru muda pucat (sky-100) */
-    --option-hover: #bae6fd; /* (sky-200) */
+    --option-bg: #f1f5f9;
+    --option-hover: #e2e8f0;
     
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -368,6 +368,19 @@ body {
     background-color: var(--wrong-bg);
     color: var(--wrong-text);
     border: 1px solid var(--wrong-border);
+}
+
+.option-btn.selected-neutral,
+.feedback-container.selected-neutral {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+.option-btn.selected-neutral .option-letter {
+    background-color: #9ca3af;
+    color: white;
+    border-color: #9ca3af;
 }
 
 .feedback-container.null-feedback {
